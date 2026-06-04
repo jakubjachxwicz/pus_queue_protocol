@@ -1,6 +1,9 @@
 #include "../types.h"
 #include "handlers.h"
 
+// should be kept as secret but whatever
+#define KIOSK_API_KEY "somesupersecretdonttellanybody"
+
 
 void handle_hello(client_conn_t *conn, const char *msg)
 {
@@ -22,7 +25,7 @@ void handle_hello(client_conn_t *conn, const char *msg)
         return;
     }
 
-    /* Rozpoznaj client_type */
+    // validate client type
     if (strcmp(client_type, "kiosk") == 0)
         conn->client_type = CLIENT_KIOSK;
     else if (strcmp(client_type, "app") == 0)
@@ -32,6 +35,21 @@ void handle_hello(client_conn_t *conn, const char *msg)
                           "\"error_message\":\"ERR_BAD_FORMAT: unknown client_type\"}\n";
         ssl_send(conn->ssl, err);
         return;
+    }
+
+    // authenticate KIOSK client
+    if (conn->client_type == CLIENT_KIOSK) {
+        char api_key[128] = {0};
+        if (json_get_string(msg, "api_key", api_key, sizeof(api_key)) < 0
+            || strcmp(api_key, KIOSK_API_KEY) != 0) {
+            ssl_send(conn->ssl,
+            "{\"type\":\"ERROR\",\"error_code\":2001,"
+            "\"error_message\":\"ERR_AUTH_FAILED\"}");
+
+            printf("[%s] HELLO from KIOSK refused – invalid API key\n", conn->ip);
+            conn->authenticated = 0;
+            return;
+        }
     }
 
     /* Generuj session_id dla tej sesji */
