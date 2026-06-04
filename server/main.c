@@ -1,23 +1,13 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <arpa/inet.h>
-#include <openssl/ssl.h>
-#include <openssl/err.h>
+
+#include "types.h"
+#include "message_handlers/handlers.h"
 
 #define PORT        8443
 #define BACKLOG     16
 #define CERT_FILE   "server.crt"
 #define KEY_FILE    "server.key"
+#define MAX_MSG_SIZE 4096
 
-typedef struct 
-{
-    int      fd;
-    SSL     *ssl;
-    char     ip[INET_ADDRSTRLEN];
-} client_conn_t;
 
 static SSL_CTX *create_ssl_ctx(void)
 {
@@ -38,6 +28,7 @@ static SSL_CTX *create_ssl_ctx(void)
     return ctx;
 }
 
+
 /* -------------------------------------------------- */
 /*  Client handling thread method                     */
 /* -------------------------------------------------- */
@@ -47,7 +38,51 @@ static void *handle_client(void *arg)
 
     printf("[%s] Connected, starting client thread\n", conn->ip);
 
-    /* TODO: logic loop */
+    char    buf[MAX_MSG_SIZE];
+    size_t  buf_len = 0;
+
+    // client handling loop
+    for (;;) 
+    {
+        char chunk[1024];
+        int n = SSL_read(conn->ssl, chunk, sizeof(chunk) - 1);
+        if (n <= 0) break;
+
+        chunk[n] = '\0';
+
+        // buffer overflow (ERR_MSG_TOO_LARGE)
+        if (buf_len + n >= MAX_MSG_SIZE) 
+        {
+            ssl_send(conn->ssl,
+                "{\"type\":\"ERROR\",\"error_code\":4002,"
+                "\"error_message\":\"ERR_MSG_TOO_LARGE\"}");
+            break;
+        }
+
+        memcpy(buf + buf_len, chunk, n);
+        buf_len += n;
+        buf[buf_len] = '\0';
+
+        char *newline;
+        while ((newline = memchr(buf, '\n', buf_len)) != NULL) 
+        {
+            *newline = '\0';
+            size_t msg_len = newline - buf;
+
+            char type[32] = {0};
+            json_get_string(buf, "type", type, sizeof(type));
+
+            if (strcmp(type, "HELLO") == 0)
+                handle_hello(conn, buf);
+
+            /* TODO: REGISTER, STATUS_REQ, SUBSCRIBE, PING, BYE... */
+
+            size_t remaining = buf_len - msg_len - 1;
+            memmove(buf, newline + 1, remaining);
+            buf_len = remaining;
+            buf[buf_len] = '\0';
+        }
+    }
 
     SSL_shutdown(conn->ssl);
     SSL_free(conn->ssl);
