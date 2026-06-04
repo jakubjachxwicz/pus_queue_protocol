@@ -1,1 +1,2 @@
-main
+server/build
+cmake-build-*
