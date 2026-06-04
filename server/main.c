@@ -72,10 +72,15 @@ static void *handle_client(void *arg)
             char type[32] = {0};
             json_get_string(buf, "type", type, sizeof(type));
 
-            if (strcmp(type, "HELLO") == 0)
+            if (strcmp(type, "HELLO") == 0) {
                 handle_hello(conn, buf);
-
-            /* TODO: REGISTER, STATUS_REQ, SUBSCRIBE, PING, BYE... */
+            } else if (!conn->authenticated) {
+                ssl_send(conn->ssl,
+                "{\"type\":\"ERROR\",\"error_code\":2001,"
+                "\"error_message\":\"ERR_AUTH_FAILED: send HELLO first\"}");
+            } else {
+                /* TODO: REGISTER, STATUS_REQ, SUBSCRIBE, PING, BYE... */
+            }
 
             size_t remaining = buf_len - msg_len - 1;
             memmove(buf, newline + 1, remaining);
