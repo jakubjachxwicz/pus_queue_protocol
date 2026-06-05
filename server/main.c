@@ -82,10 +82,13 @@ static void *handle_client(void *arg)
                 "\"error_message\":\"ERR_AUTH_FAILED: send HELLO first\"}");
             } else if (strcmp(type, "REGISTER") == 0) {
                 handle_register(conn, buf);
-            } else if (strcmp(type, "SUNSCRIBE") == 0) {
+            } else if (strcmp(type, "SUBSCRIBE") == 0) {
                 handle_subscribe(conn, buf);
-            } else {
-                /* TODO: STATUS_REQ, PING, BYE... */
+            } else if (strcmp(type, "STATUS_REQ") == 0) {
+                handle_status(conn, buf);
+            }
+            else {
+                /* TODO: PING, BYE... */
             }
 
             size_t remaining = buf_len - msg_len - 1;
@@ -169,6 +172,7 @@ int main(void)
         client_conn_t *conn = malloc(sizeof(*conn));
         conn->fd  = client_fd;
         conn->ssl = ssl;
+        conn->phone_number[0] = '\0';
         inet_ntop(AF_INET, &client_addr.sin_addr, conn->ip, sizeof(conn->ip));
 
         pthread_t tid;
