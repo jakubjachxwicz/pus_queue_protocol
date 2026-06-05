@@ -10,6 +10,8 @@ add_executable(pus_queue_protocol
         message_handlers/hello.c
         main.c
         types.h
-        message_handlers/common.c)
+        message_handlers/common.c
+        queue/queue.h
+        queue/queue.c)
 
 target_link_libraries(pus_queue_protocol ssl crypto pthread)
