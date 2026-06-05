@@ -12,7 +12,7 @@ void handle_hello(client_conn_t *conn, const char *msg)
     char message_id[64]  = {0};
     char timestamp[32]   = {0};
 
-    /* Walidacja wymaganych pól */
+    // field validation
     if (json_get_string(msg, "message_id",   message_id,   sizeof(message_id))   < 0 ||
         json_get_string(msg, "version",      version,      sizeof(version))      < 0 ||
         json_get_string(msg, "client_type",  client_type,  sizeof(client_type))  < 0 ||
@@ -52,10 +52,9 @@ void handle_hello(client_conn_t *conn, const char *msg)
         }
     }
 
-    /* Generuj session_id dla tej sesji */
     generate_session_id(conn->session_id, sizeof(conn->session_id));
 
-    /* Zbuduj HELLO_ACK */
+    // build HELLO_ACK message
     char ts[32];
     iso_timestamp(ts, sizeof(ts));
 
