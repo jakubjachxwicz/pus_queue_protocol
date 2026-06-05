@@ -20,5 +20,6 @@ void iso_timestamp(char *out, size_t outlen);
 void generate_session_id(char *out, size_t outlen);
 
 void handle_hello(client_conn_t *conn, const char *msg);
+void handle_register(client_conn_t *conn, const char *msg);
 
 #endif //PUS_QUEUE_PROTOCOL_HANDLERS_H

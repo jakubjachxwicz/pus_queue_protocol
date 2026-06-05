@@ -80,6 +80,8 @@ static void *handle_client(void *arg)
                 ssl_send(conn->ssl,
                 "{\"type\":\"ERROR\",\"error_code\":2001,"
                 "\"error_message\":\"ERR_AUTH_FAILED: send HELLO first\"}");
+            } else if (strcmp(type, "REGISTER")) {
+                handle_register(conn, buf);
             } else {
                 /* TODO: REGISTER, STATUS_REQ, SUBSCRIBE, PING, BYE... */
             }
