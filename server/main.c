@@ -1,6 +1,7 @@
 
 #include "types.h"
 #include "message_handlers/handlers.h"
+#include "queue/queue.h"
 
 #define PORT        8443
 #define BACKLOG     16
@@ -8,6 +9,7 @@
 #define KEY_FILE    "server.key"
 #define MAX_MSG_SIZE 4096
 
+queue_t g_queue;
 
 static SSL_CTX *create_ssl_ctx(void)
 {
@@ -132,6 +134,8 @@ int main(void)
         exit(EXIT_FAILURE);
     }
 
+    queue_init(&g_queue);
+
     printf("Server is listening on port %d...\n", PORT);
 
     for (;;) 
@@ -173,5 +177,6 @@ int main(void)
 
     SSL_CTX_free(ctx);
     close(listen_fd);
+    queue_free(&g_queue);
     return 0;
 }
