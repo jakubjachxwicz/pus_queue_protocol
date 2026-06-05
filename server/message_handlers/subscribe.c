@@ -44,11 +44,15 @@ void handle_subscribe(client_conn_t *conn, const char *msg) {
 
     char ack[256];
     snprintf(ack, sizeof(ack),
-        "{\"type\":\"TICKET\","
+        "{\"type\":\"SUBSCRIBE_ACK\","
         "\"message_id\":\"%s\","
         "\"timestamp\":\"%s\","
         "\"session_id\":\"%s\"",
         conn->session_id,   // session if for now
         ts,
         conn->session_id);
+
+    ssl_send(conn->ssl, ack);
+
+    printf("[%s] SUBSCRIBE\n", conn->ip);
 }
