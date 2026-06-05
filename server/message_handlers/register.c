@@ -12,7 +12,7 @@ void handle_register(client_conn_t *conn, const char *msg) {
         return;
     }
 
-    char phone[PHONE_NUMBER_LENGTH];
+    char phone[PHONE_NUMBER_LENGTH] = {0};
 
     if (json_get_string(msg, "phone", phone, sizeof(phone)) < 0) {
         ssl_send(conn->ssl,
@@ -35,11 +35,13 @@ void handle_register(client_conn_t *conn, const char *msg) {
         return;
     }
 
+    strncpy(conn->phone_number, phone, PHONE_NUMBER_LENGTH - 1);
+
     // create TICKET response message
     char ts[32];
     iso_timestamp(ts, sizeof(ts));
 
-    char ticket[256];
+    char ticket[512];
     snprintf(ticket, sizeof(ticket),
         "{\"type\":\"TICKET\","
         "\"message_id\":\"%s\","

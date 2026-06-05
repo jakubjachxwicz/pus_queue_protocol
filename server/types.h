@@ -20,6 +20,7 @@ typedef struct
     char           session_id[65];
     client_type_t  client_type;
     int            authenticated;
+    char           phone_number[10];
 } client_conn_t;
 
 #endif //PUS_QUEUE_PROTOCOL_TYPES_H
