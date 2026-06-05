@@ -3,6 +3,8 @@
 #include <netinet/in.h>
 #include <openssl/types.h>
 
+#define AVG_VISIT_TIME 300 // seconds
+
 typedef enum
 {
     CLIENT_UNKNOWN = 0,
