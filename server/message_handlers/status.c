@@ -15,10 +15,10 @@ void handle_status(client_conn_t *conn, const char *msg) {
 
     char phone[PHONE_NUMBER_LENGTH] = {0};
 
-    if (conn->phone_number[0] == '\0') {
+    if (json_get_string(msg, "phone", phone, sizeof(phone)) < 0 || phone[0] == '\0') {
         ssl_send(conn->ssl,
-            "{\"type\":\"ERROR\",\"error_code\":3003,"
-            "\"error_message\":\"ERR_NOT_IN_QUEUE: send SUBSCRIBE first\"}");
+            "{\"type\":\"ERROR\",\"error_code\":1001,"
+            "\"error_message\":\"ERR_BAD_FORMAT: missing phone\"}");
         return;
     }
 
@@ -47,7 +47,7 @@ void handle_status(client_conn_t *conn, const char *msg) {
         conn->session_id,
         ts,
         conn->session_id,
-        conn->phone_number,
+        phone,
         entry.ticket_number,
         entry.position,
         entry.position * AVG_VISIT_TIME);
@@ -55,5 +55,5 @@ void handle_status(client_conn_t *conn, const char *msg) {
     ssl_send(conn->ssl, resp);
 
     printf("[%s] STATUS_REQ phone=%s position=%d estimated time=%ds\n",
-           conn->ip, conn->phone_number, entry.position, entry.position * AVG_VISIT_TIME);
+           conn->ip, phone, entry.position, entry.position * AVG_VISIT_TIME);
 }
