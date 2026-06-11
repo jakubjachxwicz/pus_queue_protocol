@@ -8,10 +8,9 @@
 #include "common/client_common.h"
 #include "handlers/handlers.h"
 
-#define DEFAULT_HOST   "127.0.0.1"
-#define DEFAULT_PORT   8443
-#define CA_FILE        "ca.crt"
-#define app_API_KEY  "somesupersecretdonttellanybody"
+#define DEFAULT_HOST  "127.0.0.1"
+#define DEFAULT_PORT  8443
+#define CA_FILE       "ca.crt"
 
 static void app_loop(SSL *ssl, const char *session_id)
 {
@@ -46,8 +45,22 @@ static void app_loop(SSL *ssl, const char *session_id)
         }
 
         if (do_status_req(ssl, session_id, phone) < 0) {
-            printf("[app] Status req failed. Please try again.\n\n");
+            printf("[app] Status request failed. Please try again.\n\n");
             continue;
+        }
+
+        printf("Subscribe to notifications? (y/n): ");
+        fflush(stdout);
+
+        char answer[8];
+        if (!fgets(answer, sizeof(answer), stdin)) {
+            printf("\n");
+            break;
+        }
+
+        if (answer[0] == 'y' || answer[0] == 'Y') {
+            if (do_subscribe(ssl, session_id, phone) < 0)
+                printf("[app] Subscription failed.\n\n");
         }
     }
 }
@@ -61,7 +74,7 @@ int main(int argc, char *argv[])
     if (argc >= 3) port = atoi(argv[2]);
 
     printf("app client\n");
-    printf("Connecting with %s:%d...\n", host, port);
+    printf("Connecting to %s:%d...\n", host, port);
 
     SSL_CTX *ctx = create_client_ssl_ctx(CA_FILE);
     if (!ctx) return EXIT_FAILURE;
@@ -75,7 +88,7 @@ int main(int argc, char *argv[])
     printf("[app] Connected.\n");
 
     char session_id[65] = {0};
-    if (do_hello(ssl, "app", app_API_KEY, session_id, sizeof(session_id)) < 0) {
+    if (do_hello(ssl, "app", NULL, session_id, sizeof(session_id)) < 0) {
         fprintf(stderr, "[app] Protocol handshake failed\n");
         SSL_shutdown(ssl); SSL_free(ssl);
         close(fd); SSL_CTX_free(ctx);

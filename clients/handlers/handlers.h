@@ -7,5 +7,6 @@ int do_hello(SSL *ssl, const char *client_type, const char *api_key, char *sessi
 void do_bye(SSL *ssl, const char *session_id);
 int do_register(SSL *ssl, const char *session_id, const char *phone);
 int do_status_req(SSL *ssl, const char *session_id, const char *phone);
+int do_subscribe(SSL *ssl, const char *session_id, const char *phone);
 
 #endif /* PUS_CLIENT_HANDLERS_H */
