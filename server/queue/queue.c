@@ -112,7 +112,7 @@ int queue_find_by_phone(queue_t *queue, const char* phone, queue_entry_t *out) {
 
     int found = 0;
     for (int i = 0; i < QUEUE_MAX_SIZE; i++) {
-        if (queue->entries[i].state == ENTRY_FREE && strcmp(queue->entries[i].phone_number, phone) == 0) {
+        if (queue->entries[i].state != ENTRY_FREE && strcmp(queue->entries[i].phone_number, phone) == 0) {
             if (out) *out = queue->entries[i];
             found = 1;
             break;
@@ -128,7 +128,7 @@ int queue_update_session(queue_t *queue, const char* phone, const char* session_
 
     int found = 0;
     for (int i = 0; i < QUEUE_MAX_SIZE; i++) {
-        if (queue->entries[i].state == ENTRY_FREE && strcmp(queue->entries[i].phone_number, phone) == 0) {
+        if (queue->entries[i].state != ENTRY_FREE && strcmp(queue->entries[i].phone_number, phone) == 0) {
             strncpy(queue->entries[i].session_id, session_id, SESSION_ID_LENGTH - 1);
             queue->entries[i].last_active = time(NULL);
             found = 1;
@@ -144,7 +144,7 @@ int queue_set_subscribed(queue_t *queue, const char* phone, int value) {
     pthread_mutex_lock(&queue->mutex);
     int found = 0;
     for (int i = 0; i < QUEUE_MAX_SIZE; i++) {
-        if (queue->entries[i].state == ENTRY_FREE && strcmp(queue->entries[i].phone_number, phone) == 0) {
+        if (queue->entries[i].state != ENTRY_FREE && strcmp(queue->entries[i].phone_number, phone) == 0) {
             queue->entries[i].subscribed = value;
             found = 1;
             break;
@@ -160,7 +160,7 @@ int queue_set_state(queue_t *queue, const char* phone, entry_state_t state) {
 
     int found = 0;
     for (int i = 0; i < QUEUE_MAX_SIZE; i++) {
-        if (queue->entries[i].state == ENTRY_FREE && strcmp(queue->entries[i].phone_number, phone) == 0) {
+        if (queue->entries[i].state != ENTRY_FREE && strcmp(queue->entries[i].phone_number, phone) == 0) {
             queue->entries[i].state = state;
             found = 1;
             break;
@@ -176,7 +176,7 @@ int queue_phone_exists(queue_t *queue, const char* phone) {
 
     int found = 0;
     for (int i = 0; i < QUEUE_MAX_SIZE; i++) {
-        if (queue->entries[i].state == ENTRY_FREE && strcmp(queue->entries[i].phone_number, phone) == 0) {
+        if (queue->entries[i].state != ENTRY_FREE && strcmp(queue->entries[i].phone_number, phone) == 0) {
             found = 1;
             break;
         }
