@@ -54,5 +54,5 @@ void handle_subscribe(client_conn_t *conn, const char *msg) {
 
     ssl_send(conn->ssl, ack);
 
-    printf("[%s] SUBSCRIBE\n", conn->ip);
+    printf("[%s] SUBSCRIBE, phone: %s, session_id: %s\n", conn->ip, phone, conn->session_id);
 }

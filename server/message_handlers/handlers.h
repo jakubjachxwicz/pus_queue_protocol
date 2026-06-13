@@ -23,5 +23,7 @@ void handle_hello(client_conn_t *conn, const char *msg);
 void handle_register(client_conn_t *conn, const char *msg);
 void handle_subscribe(client_conn_t *conn, const char *msg);
 void handle_status(client_conn_t *conn, const char *msg);
+void handle_ping(client_conn_t *conn, const char *msg);
+void handle_bye(client_conn_t *conn, const char *msg);
 
 #endif //PUS_QUEUE_PROTOCOL_HANDLERS_H

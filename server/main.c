@@ -86,9 +86,18 @@ static void *handle_client(void *arg)
                 handle_subscribe(conn, buf);
             } else if (strcmp(type, "STATUS_REQ") == 0) {
                 handle_status(conn, buf);
+            } else if (strcmp(type, "PING") == 0) {
+                handle_ping(conn, buf);
+            } else if (strcmp(type, "PONG") == 0) {
+                // ingore
+            } else if (strcmp(type, "BYE") == 0) {
+                handle_bye(conn, buf);
+                goto disconnect;
             }
             else {
-                /* TODO: PING, BYE... */
+                ssl_send(conn->ssl,
+                    "{\"type\":\"ERROR\",\"error_code\":1004,"
+                    "\"error_message\":\"ERR_UNKNOWN_TYPE\"}");
             }
 
             size_t remaining = buf_len - msg_len - 1;
@@ -98,6 +107,7 @@ static void *handle_client(void *arg)
         }
     }
 
+disconnect:
     SSL_shutdown(conn->ssl);
     SSL_free(conn->ssl);
     close(conn->fd);
