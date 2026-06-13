@@ -1,3 +1,8 @@
 server/build
 clients/build
 cmake-build-*
+
+*.crt
+*.csr
+*.key
+*.srl
