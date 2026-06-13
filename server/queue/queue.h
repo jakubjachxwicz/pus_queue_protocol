@@ -45,5 +45,6 @@ int queue_set_state(queue_t *queue, const char* phone, entry_state_t state);
 
 void queue_recalculate(queue_t *queue);
 int queue_phone_exists(queue_t *queue, const char* phone);
+int queue_remove_first(queue_t *queue, queue_entry_t *out);
 
 #endif //PUS_QUEUE_PROTOCOL_QUEUE_H

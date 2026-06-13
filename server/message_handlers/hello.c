@@ -30,6 +30,8 @@ void handle_hello(client_conn_t *conn, const char *msg)
         conn->client_type = CLIENT_KIOSK;
     else if (strcmp(client_type, "app") == 0)
         conn->client_type = CLIENT_APP;
+    else if (strcmp(client_type, "admin") == 0)
+        conn->client_type = CLIENT_ADMIN;
     else {
         const char *err = "{\"type\":\"ERROR\",\"error_code\":1001,"
                           "\"error_message\":\"ERR_BAD_FORMAT: unknown client_type\"}\n";
@@ -37,8 +39,8 @@ void handle_hello(client_conn_t *conn, const char *msg)
         return;
     }
 
-    // authenticate KIOSK client
-    if (conn->client_type == CLIENT_KIOSK) {
+    // authenticate KIOSK and ADMIN with API key
+    if (conn->client_type == CLIENT_KIOSK || conn->client_type == CLIENT_ADMIN) {
         char api_key[128] = {0};
         if (json_get_string(msg, "api_key", api_key, sizeof(api_key)) < 0
             || strcmp(api_key, KIOSK_API_KEY) != 0) {
@@ -46,7 +48,7 @@ void handle_hello(client_conn_t *conn, const char *msg)
             "{\"type\":\"ERROR\",\"error_code\":2001,"
             "\"error_message\":\"ERR_AUTH_FAILED\"}");
 
-            printf("[%s] HELLO from KIOSK refused – invalid API key\n", conn->ip);
+            printf("[%s] HELLO from %s refused – invalid API key\n", conn->ip, client_type);
             conn->authenticated = 0;
             return;
         }

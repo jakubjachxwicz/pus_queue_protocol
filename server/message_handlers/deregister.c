@@ -5,8 +5,7 @@ extern queue_t g_queue;
 
 void handle_deregister(client_conn_t *conn, const char *msg)
 {
-    // only kiosk can deregister patients
-    if (conn->client_type != CLIENT_KIOSK) {
+    if (conn->client_type != CLIENT_ADMIN) {
         ssl_send(conn->ssl,
             "{\"type\":\"ERROR\",\"error_code\":2002,"
             "\"error_message\":\"ERR_UNAUTHORIZED\"}");
@@ -15,19 +14,15 @@ void handle_deregister(client_conn_t *conn, const char *msg)
 
     char phone[PHONE_NUMBER_LENGTH] = {0};
 
-    if (json_get_string(msg, "phone", phone, sizeof(phone)) < 0) {
-        ssl_send(conn->ssl,
-            "{\"type\":\"ERROR\",\"error_code\":1001,"
-            "\"error_message\":\"ERR_BAD_FORMAT: missing phone\"}");
-        return;
-    }
+    queue_entry_t entry;
 
-    if (queue_remove(&g_queue, phone) < 0) {
+    if (queue_remove_first(&g_queue, &entry) < 0) {
         ssl_send(conn->ssl,
             "{\"type\":\"ERROR\",\"error_code\":3003,"
-            "\"error_message\":\"ERR_NOT_IN_QUEUE\"}");
+            "\"error_message\":\"ERR_NOT_IN_QUEUE: queue is empty\"}");
         return;
     }
+    strncpy(phone, entry.phone_number, PHONE_NUMBER_LENGTH - 1);
 
     char ts[32];
     iso_timestamp(ts, sizeof(ts));
