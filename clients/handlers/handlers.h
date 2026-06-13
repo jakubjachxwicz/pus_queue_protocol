@@ -8,6 +8,7 @@ void do_bye(SSL *ssl, const char *session_id);
 int do_register(SSL *ssl, const char *session_id, const char *phone);
 int do_status_req(SSL *ssl, const char *session_id, const char *phone);
 int do_subscribe(SSL *ssl, const char *session_id, const char *phone);
+int do_deregister(SSL *ssl, const char *session_id);
 
 int start_notify_listener(SSL *ssl, const char *session_id);
 

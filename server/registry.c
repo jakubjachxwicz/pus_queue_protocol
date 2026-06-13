@@ -38,6 +38,7 @@ client_conn_t *registry_find_by_phone(client_registry_t *reg, const char *phone)
     pthread_mutex_lock(&reg->mutex);
     for (int i = 0; i < MAX_CLIENTS; i++) {
         if (reg->clients[i] != NULL &&
+            reg->clients[i]->client_type == CLIENT_APP &&
             reg->clients[i]->phone_number[0] != '\0' &&
             strcmp(reg->clients[i]->phone_number, phone) == 0) {
             found = reg->clients[i];

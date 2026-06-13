@@ -24,3 +24,12 @@ add_executable(app_client
 
 target_include_directories(app_client PRIVATE ${CLIENTS_ROOT})
 target_link_libraries(app_client ssl crypto pthread)
+
+add_executable(admin_client
+        admin_main.c
+        ${CLIENTS_ROOT}/clients/handlers/hello.c
+        ${CLIENTS_ROOT}/clients/handlers/deregister.c
+        ${CLIENTS_ROOT}/clients/common/client_common.c)
+
+target_include_directories(admin_client PRIVATE ${CLIENTS_ROOT})
+target_link_libraries(admin_client ssl crypto)

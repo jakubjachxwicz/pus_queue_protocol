@@ -14,7 +14,8 @@ typedef enum
 {
     CLIENT_UNKNOWN = 0,
     CLIENT_KIOSK,
-    CLIENT_APP
+    CLIENT_APP,
+    CLIENT_ADMIN
 } client_type_t;
 
 typedef struct

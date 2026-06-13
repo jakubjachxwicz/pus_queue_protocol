@@ -185,3 +185,28 @@ int queue_phone_exists(queue_t *queue, const char* phone) {
     pthread_mutex_unlock(&queue->mutex);
     return found;
 }
+
+int queue_remove_first(queue_t *queue, queue_entry_t *out) {
+    pthread_mutex_lock(&queue->mutex);
+
+    int idx = -1;
+    for (int i = 0; i < QUEUE_MAX_SIZE; i++) {
+        if (queue->entries[i].state != ENTRY_FREE && queue->entries[i].position == 1) {
+            idx = i;
+            break;
+        }
+    }
+
+    if (idx < 0) {
+        pthread_mutex_unlock(&queue->mutex);
+        return -1;
+    }
+
+    if (out) *out = queue->entries[idx];
+    memset(&queue->entries[idx], 0, sizeof(queue->entries[idx]));
+    queue->count--;
+    recalculate_locked(queue);
+
+    pthread_mutex_unlock(&queue->mutex);
+    return 0;
+}
