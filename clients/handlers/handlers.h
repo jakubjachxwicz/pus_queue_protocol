@@ -9,4 +9,6 @@ int do_register(SSL *ssl, const char *session_id, const char *phone);
 int do_status_req(SSL *ssl, const char *session_id, const char *phone);
 int do_subscribe(SSL *ssl, const char *session_id, const char *phone);
 
+int start_notify_listener(SSL *ssl, const char *session_id);
+
 #endif /* PUS_CLIENT_HANDLERS_H */

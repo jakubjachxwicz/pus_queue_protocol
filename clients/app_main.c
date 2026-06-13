@@ -61,6 +61,8 @@ static void app_loop(SSL *ssl, const char *session_id)
         if (answer[0] == 'y' || answer[0] == 'Y') {
             if (do_subscribe(ssl, session_id, phone) < 0)
                 printf("[app] Subscription failed.\n\n");
+            else
+                start_notify_listener(ssl, session_id);
         }
     }
 }
