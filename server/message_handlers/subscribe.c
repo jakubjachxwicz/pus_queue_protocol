@@ -38,6 +38,8 @@ void handle_subscribe(client_conn_t *conn, const char *msg) {
         return;
     }
 
+    strncpy(conn->phone_number, phone, sizeof(conn->phone_number) - 1);
+
     // create SUBSCRIBE_ACK response message
     char ts[32];
     iso_timestamp(ts, sizeof(ts));

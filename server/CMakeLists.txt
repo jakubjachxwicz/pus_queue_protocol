@@ -17,6 +17,10 @@ add_executable(pus_queue_protocol
         message_handlers/subscribe.c
         message_handlers/status.c
         message_handlers/ping.c
-        message_handlers/bye.c)
+        message_handlers/bye.c
+        registry.c
+        notify.h
+        notify.c
+        message_handlers/notify_ack.c)
 
 target_link_libraries(pus_queue_protocol ssl crypto pthread)
