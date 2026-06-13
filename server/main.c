@@ -1,7 +1,7 @@
-
 #include "types.h"
 #include "message_handlers/handlers.h"
 #include "queue/queue.h"
+#include "notify.h"
 
 #define PORT        8443
 #define BACKLOG     16
@@ -10,6 +10,7 @@
 #define MAX_MSG_SIZE 4096
 
 queue_t g_queue;
+client_registry_t g_registry;
 
 static SSL_CTX *create_ssl_ctx(void)
 {
@@ -39,6 +40,8 @@ static void *handle_client(void *arg)
     client_conn_t *conn = arg;
 
     printf("[%s] Connected, starting client thread\n", conn->ip);
+
+    registry_add(&g_registry, conn);
 
     char    buf[MAX_MSG_SIZE];
     size_t  buf_len = 0;
@@ -86,6 +89,8 @@ static void *handle_client(void *arg)
                 handle_subscribe(conn, buf);
             } else if (strcmp(type, "STATUS_REQ") == 0) {
                 handle_status(conn, buf);
+            } else if (strcmp(type, "NOTIFY_ACK") == 0) {
+                handle_notify_ack(conn, buf);
             } else if (strcmp(type, "PING") == 0) {
                 handle_ping(conn, buf);
             } else if (strcmp(type, "PONG") == 0) {
@@ -108,6 +113,7 @@ static void *handle_client(void *arg)
     }
 
 disconnect:
+    registry_remove(&g_registry, conn);
     SSL_shutdown(conn->ssl);
     SSL_free(conn->ssl);
     close(conn->fd);
@@ -152,6 +158,8 @@ int main(void)
     }
 
     queue_init(&g_queue);
+    registry_init(&g_registry);
+    notify_thread_start(&g_queue, &g_registry);
 
     printf("Server is listening on port %d...\n", PORT);
 
@@ -183,6 +191,9 @@ int main(void)
         conn->fd  = client_fd;
         conn->ssl = ssl;
         conn->phone_number[0] = '\0';
+        conn->authenticated = 0;
+        conn->client_type = CLIENT_UNKNOWN;
+        conn->notify_ack_received = 0;
         inet_ntop(AF_INET, &client_addr.sin_addr, conn->ip, sizeof(conn->ip));
 
         pthread_t tid;
