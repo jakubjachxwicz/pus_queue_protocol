@@ -19,7 +19,8 @@ add_executable(app_client
         ${CLIENTS_ROOT}/clients/handlers/hello.c
         ${CLIENTS_ROOT}/clients/handlers/status.c
         ${CLIENTS_ROOT}/clients/handlers/subscribe.c
-        ${CLIENTS_ROOT}/clients/common/client_common.c)
+        ${CLIENTS_ROOT}/clients/common/client_common.c
+        handlers/notify.c)
 
 target_include_directories(app_client PRIVATE ${CLIENTS_ROOT})
-target_link_libraries(app_client ssl crypto)
+target_link_libraries(app_client ssl crypto pthread)
