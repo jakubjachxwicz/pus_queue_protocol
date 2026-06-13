@@ -91,6 +91,8 @@ static void *handle_client(void *arg)
                 handle_status(conn, buf);
             } else if (strcmp(type, "NOTIFY_ACK") == 0) {
                 handle_notify_ack(conn, buf);
+            } else if (strcmp(type, "DEREGISTER") == 0) {
+                handle_deregister(conn, buf);
             } else if (strcmp(type, "PING") == 0) {
                 handle_ping(conn, buf);
             } else if (strcmp(type, "PONG") == 0) {

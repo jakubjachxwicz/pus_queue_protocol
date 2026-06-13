@@ -18,6 +18,7 @@ add_executable(pus_queue_protocol
         message_handlers/status.c
         message_handlers/ping.c
         message_handlers/bye.c
+        message_handlers/deregister.c
         registry.c
         notify.h
         notify.c
