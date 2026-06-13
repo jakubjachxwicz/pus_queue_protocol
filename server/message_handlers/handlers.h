@@ -26,5 +26,6 @@ void handle_status(client_conn_t *conn, const char *msg);
 void handle_ping(client_conn_t *conn, const char *msg);
 void handle_bye(client_conn_t *conn, const char *msg);
 void handle_notify_ack(client_conn_t *conn, const char *msg);
+void handle_deregister(client_conn_t *conn, const char *msg);
 
 #endif //PUS_QUEUE_PROTOCOL_HANDLERS_H
