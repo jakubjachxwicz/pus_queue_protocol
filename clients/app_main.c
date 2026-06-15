@@ -17,8 +17,17 @@ static void app_loop(SSL *ssl, const char *session_id)
     printf("\nApp ready. Enter phone number or 'q' to exit.\n\n");
 
     char phone[32];
+    int is_subscribed = 0;
 
     for (;;) {
+        if (is_subscribed) {
+            char discard[256];
+            for (;;) {
+                printf("Waiting for notification...\n");
+                fflush(stdout);
+                fgets(discard, sizeof(discard), stdin);
+            }
+        }
         printf("Enter phone number: ");
         fflush(stdout);
 
@@ -61,8 +70,10 @@ static void app_loop(SSL *ssl, const char *session_id)
         if (answer[0] == 'y' || answer[0] == 'Y') {
             if (do_subscribe(ssl, session_id, phone) < 0)
                 printf("[app] Subscription failed.\n\n");
-            else
+            else {
+                is_subscribed = 1;
                 start_notify_listener(ssl, session_id);
+            }
         }
     }
 }
